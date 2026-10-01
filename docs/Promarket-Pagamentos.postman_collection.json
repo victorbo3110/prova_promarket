@@ -1,0 +1,199 @@
+{
+  "info": {
+    "name": "Promarket - Pagamentos API",
+    "description": "Coleção de requisições para a API REST de pagamentos da Prova Promarket.\n\nEndpoints disponíveis:\n- POST /pagamentos\n- GET /pagamentos\n- GET /pagamentos/{id}\n- PUT /pagamentos/{id}\n- DELETE /pagamentos/{id}\n\nRegras:\n- A API usa SQLite para persistência local.\n- O valor do campo 'id' representa o identificador do pagamento.\n- O campo 'pedidoId' representa o identificador do pedido relacionado ao pagamento.\n- O campo 'status' retorna 'ok' em sucesso.\n- A porta padrão da API é http://localhost:5000",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "promarket-pagamentos-api-2026"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Pagamentos",
+      "description": "Operações do módulo de pagamentos.",
+      "item": [
+        {
+          "name": "POST /pagamentos - Criar pagamento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pedidoId\": 10,\n  \"eventoId\": 20,\n  \"valor\": 99.90\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pagamentos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagamentos"
+              ]
+            },
+            "description": "Cria um novo pagamento validando pedidoId, eventoId e valor."
+          },
+          "response": [
+            {
+              "name": "Sucesso",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"pedidoId\": 10,\n  \"eventoId\": 20,\n  \"valor\": 99.90\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/pagamentos",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "pagamentos"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"idPagamento\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /pagamentos - Listar pagamentos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pagamentos?ordem=desc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagamentos"
+              ],
+              "query": [
+                {
+                  "key": "ordem",
+                  "value": "desc",
+                  "description": "Ordenação dos pagamentos: asc ou desc"
+                }
+              ]
+            },
+            "description": "Busca os pagamentos mais recentes por ordem decrescente ou crescente."
+          },
+          "response": [
+            {
+              "name": "Lista de pagamentos",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/pagamentos?ordem=desc",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "pagamentos"
+                  ],
+                  "query": [
+                    { "key": "ordem", "value": "desc" }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "[\n  {\n    \"id\": 1,\n    \"pedidoId\": 10,\n    \"eventoId\": 20,\n    \"valor\": 99.9,\n    \"status\": \"ok\",\n    \"criadoEm\": \"2026-10-01T23:23:47.3202234\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "GET /pagamentos/{id} - Buscar por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pagamentos/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagamentos",
+                "1"
+              ]
+            },
+            "description": "Retorna um pagamento específico pelo seu identificador."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /pagamentos/{id} - Atualizar pagamento",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pedidoId\": 15,\n  \"eventoId\": 25,\n  \"valor\": 150.00\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pagamentos/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagamentos",
+                "1"
+              ]
+            },
+            "description": "Atualiza os dados de um pagamento existente."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /pagamentos/{id} - Deletar pagamento",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pagamentos/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagamentos",
+                "1"
+              ]
+            },
+            "description": "Remove o pagamento com o identificador informado."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

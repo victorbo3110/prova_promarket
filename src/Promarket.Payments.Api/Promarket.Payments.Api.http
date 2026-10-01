@@ -1,0 +1,6 @@
+@Promarket.Payments.Api_HostAddress = http://localhost:5171
+
+GET {{Promarket.Payments.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
