@@ -18,7 +18,7 @@ public class PagamentoDbContext : DbContext
             entity.HasKey(x => x.Id);
             entity.Property(x => x.Status).HasMaxLength(20).IsRequired();
             entity.Property(x => x.Valor).HasColumnType("decimal(18,2)");
-            entity.Property(x => x.RequestId).IsRequired(false);
+            entity.Property(x => x.RequestId).IsRequired();
             entity.HasIndex(x => x.RequestId).IsUnique();
         });
 
