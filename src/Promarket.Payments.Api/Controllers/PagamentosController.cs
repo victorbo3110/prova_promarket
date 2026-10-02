@@ -29,7 +29,7 @@ public class PagamentosController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new { Status = "Inválido", Mensagem = ex.Message });
+            return Conflict(new { Status = "Inválido", Mensagem = ex.Message });
         }
     }
 

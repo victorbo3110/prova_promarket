@@ -3,6 +3,7 @@ namespace Promarket.Payments.Api.Core.Domain;
 public class Pagamento
 {
     public int Id { get; set; }
+    public int RequestId { get; set; }
     public int PedidoId { get; set; }
     public int EventoId { get; set; }
     public decimal Valor { get; set; }
@@ -12,6 +13,7 @@ public class Pagamento
 
 public class PagamentoRequest
 {
+    public int Id { get; set; }
     public int PedidoId { get; set; }
     public int EventoId { get; set; }
     public decimal Valor { get; set; }

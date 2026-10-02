@@ -1,5 +1,7 @@
 # Prova Promarket - API de Pagamentos
 
+Repositório GitHub: https://github.com/victorbo3110/prova_promarket.git
+
 Aplicação REST para registrar pagamentos, com arquitetura voltada para evolução e preparação para mensageria em futuras integrações.
 
 ## Visão geral
@@ -164,41 +166,39 @@ A aplicação usa SQLite e cria automaticamente o banco local `pagamentos.db` ao
 
 ## Como a idempotência foi tratada
 
-A idempotência foi pensada na criação de qualquer registro e aplicada no fluxo de criação de pagamento.
+A idempotência foi pensada na criação de qualquer registro e aplicada no fluxo de criação de pagamento usando um `id` de operação exclusivo da requisição.
 
 ### Estratégia adotada
 
-Ao criar um pagamento, a aplicação verifica se já existe um registro com o mesmo `pedidoId` e `eventoId`.
+O cliente envia um `id` único para identificar a tentativa de pagamento. Se a mesma requisição for reenviada em um curto intervalo, a API rejeita a segunda tentativa com `409 Conflict` e não cria um novo pagamento duplicado.
 
-Se existir, ela retorna o pagamento existente em vez de criar outro registro duplicado.
-
-Isso evita duplicidade por reenvio da mesma requisição e ajuda a manter consistência no sistema.
+Isso evita duplicidade por retry de rede, reenvio do cliente ou processamento repetido da mesma operação.
 
 ### Implementação
 
 No serviço de aplicação, o método de criação faz:
 
 ```csharp
-var existente = await _context.Pagamentos
-    .FirstOrDefaultAsync(p => p.PedidoId == request.PedidoId && p.EventoId == request.EventoId);
+var repetido = await _context.Pagamentos
+    .AnyAsync(p => p.RequestId == request.Id);
 
-if (existente is not null)
-    return existente;
+if (repetido)
+    throw new InvalidOperationException("Requisição duplicada: esta operação já foi processada recentemente.");
 ```
 
 Ou seja:
 
-- se o mesmo pedido e evento chegarem novamente,
-- o sistema entende que a operação já foi efetuada,
-- e não gera um novo registro.
+- se a mesma operação chegar novamente com o mesmo `id`,
+- a API responde como duplicada,
+- e não gera um segundo pagamento.
 
 ### Por que isso importa
 
-Em cenários reais de múltiplos envios, retries de rede, reprocessamento ou chamadas duplicadas do cliente, a idempotência reduz:
+Em cenários reais de reenvio ou retry, isso reduz:
 
 - duplicidade de pagamentos
 - inconsistência de dados
-- erro de processamento em clientes repetindo a mesma ação
+- processamento acidental do mesmo pedido mais de uma vez
 
 ## Testes
 
@@ -207,6 +207,18 @@ Para executar os testes da API:
 ```bash
 dotnet test --nologo
 ```
+
+## Registro dos prompts usados com a IA
+
+Os prompts principais usados durante o desenvolvimento da tarefa foram:
+
+1. "Crie uma API REST .NET com endpoint POST /pagamentos, SQLite e estrutura hexagonal simples."
+2. "Adicione idempotência para evitar duplicação quando o mesmo eventoId chega mais de uma vez."
+3. "Implemente testes automatizados cobrindo o caso de duplicidade e listagem dos pagamentos."
+4. "Crie um README curto com instruções de execução e regras do projeto."
+5. "Gere uma collection do Postman para testar os endpoints da API."
+
+Esses prompts foram usados para guiar a implementação, validar a arquitetura e confirmar o comportamento esperado em testes automatizados.
 
 ## Collection do Postman
 

@@ -33,11 +33,14 @@ docs/Promarket-Pagamentos.postman_collection.json
 
 ```json
 {
+  "id": 1001,
   "pedidoId": 10,
   "eventoId": 20,
   "valor": 99.90
 }
 ```
+
+A propriedade `id` é a chave de idempotência: requisições repetidas com o mesmo valor em intervalo curto devem ser rejeitadas com `409 Conflict`.
 
 ## Resposta de sucesso
 

@@ -30,7 +30,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"pedidoId\": 10,\n  \"eventoId\": 20,\n  \"valor\": 99.90\n}"
+              "raw": "{\n  \"id\": 1001,\n  \"pedidoId\": 10,\n  \"eventoId\": 20,\n  \"valor\": 99.90\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/pagamentos",
@@ -51,7 +51,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"pedidoId\": 10,\n  \"eventoId\": 20,\n  \"valor\": 99.90\n}"
+                  "raw": "{\n  \"id\": 1001,\n  \"pedidoId\": 10,\n  \"eventoId\": 20,\n  \"valor\": 99.90\n}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/pagamentos",

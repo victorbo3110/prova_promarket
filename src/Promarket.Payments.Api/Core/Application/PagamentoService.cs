@@ -20,14 +20,15 @@ public class PagamentoService
 
         ValidarRequest(request);
 
-        var existente = await _context.Pagamentos
-            .FirstOrDefaultAsync(p => p.PedidoId == request.PedidoId && p.EventoId == request.EventoId);
+        var repetido = await _context.Pagamentos
+            .AnyAsync(p => p.RequestId == request.Id);
 
-        if (existente is not null)
-            return existente;
+        if (repetido)
+            throw new InvalidOperationException("Requisição duplicada: esta operação já foi processada recentemente.");
 
         var pagamento = new Pagamento
         {
+            RequestId = request.Id,
             PedidoId = request.PedidoId,
             EventoId = request.EventoId,
             Valor = request.Valor,
@@ -89,10 +90,10 @@ public class PagamentoService
             throw new KeyNotFoundException("Pagamento não encontrado.");
 
         var jaExiste = await _context.Pagamentos
-            .AnyAsync(p => p.Id != id && p.PedidoId == request.PedidoId && p.EventoId == request.EventoId);
+            .AnyAsync(p => p.Id != id && p.EventoId == request.EventoId);
 
         if (jaExiste)
-            throw new InvalidOperationException("Já existe um pagamento para este pedido e evento.");
+            throw new InvalidOperationException("Já existe um pagamento para este evento.");
 
         pagamento.PedidoId = request.PedidoId;
         pagamento.EventoId = request.EventoId;
@@ -116,6 +117,9 @@ public class PagamentoService
 
     private static void ValidarRequest(PagamentoRequest request)
     {
+        if (request.Id <= 0)
+            throw new ArgumentException("id deve ser maior que zero.");
+
         if (request.PedidoId <= 0)
             throw new ArgumentException("pedidoId deve ser maior que zero.");
 
