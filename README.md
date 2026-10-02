@@ -108,6 +108,8 @@ Body:
 }
 ```
 
+> A idempotência da criação é baseada no `pedidoId`: se o mesmo pedido for enviado novamente, a API rejeita com `409 Conflict`.
+
 Resposta de sucesso:
 
 ```json
@@ -170,7 +172,7 @@ A idempotência foi pensada na criação de qualquer registro e aplicada no flux
 
 ### Estratégia adotada
 
-O cliente envia um `id` único para identificar a tentativa de pagamento. Se a mesma requisição for reenviada em um curto intervalo, a API rejeita a segunda tentativa com `409 Conflict` e não cria um novo pagamento duplicado.
+A idempotência da criação é definida pelo `pedidoId`. Se o mesmo pedido for solicitado novamente, a API rejeita a segunda tentativa com `409 Conflict` e não cria um novo pagamento duplicado.
 
 Isso evita duplicidade por retry de rede, reenvio do cliente ou processamento repetido da mesma operação.
 
@@ -180,17 +182,17 @@ No serviço de aplicação, o método de criação faz:
 
 ```csharp
 var repetido = await _context.Pagamentos
-    .AnyAsync(p => p.RequestId == request.Id);
+    .AnyAsync(p => p.PedidoId == request.PedidoId);
 
 if (repetido)
-    throw new InvalidOperationException("Requisição duplicada: esta operação já foi processada recentemente.");
+    throw new InvalidOperationException("Requisição duplicada: já existe um pagamento para este pedidoId.");
 ```
 
 Ou seja:
 
-- se a mesma operação chegar novamente com o mesmo `id`,
-- a API responde como duplicada,
-- e não gera um segundo pagamento.
+- o `pedidoId` funciona como chave de idempotência;
+- o mesmo pedido não pode ser registrado duas vezes;
+- a API responde como duplicada e não gera um segundo pagamento.
 
 ### Por que isso importa
 

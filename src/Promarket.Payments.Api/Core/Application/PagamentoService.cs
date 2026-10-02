@@ -7,6 +7,7 @@ namespace Promarket.Payments.Api.Core.Application;
 public class PagamentoService
 {
     private readonly PagamentoDbContext _context;
+    private static int _proximoRequestId = 1;
 
     public PagamentoService(PagamentoDbContext context)
     {
@@ -21,14 +22,14 @@ public class PagamentoService
         ValidarRequest(request);
 
         var repetido = await _context.Pagamentos
-            .AnyAsync(p => p.RequestId == request.Id);
+            .AnyAsync(p => p.PedidoId == request.PedidoId);
 
         if (repetido)
-            throw new InvalidOperationException("Requisição duplicada: esta operação já foi processada recentemente.");
+            throw new InvalidOperationException("Requisição duplicada: já existe um pagamento para este pedidoId.");
 
         var pagamento = new Pagamento
         {
-            RequestId = request.Id,
+            RequestId = request.Id ?? GerarRequestId(),
             PedidoId = request.PedidoId,
             EventoId = request.EventoId,
             Valor = request.Valor,
@@ -117,7 +118,7 @@ public class PagamentoService
 
     private static void ValidarRequest(PagamentoRequest request)
     {
-        if (request.Id <= 0)
+        if (request.Id is not null && request.Id <= 0)
             throw new ArgumentException("id deve ser maior que zero.");
 
         if (request.PedidoId <= 0)
@@ -128,6 +129,11 @@ public class PagamentoService
 
         if (request.Valor <= 0)
             throw new ArgumentException("valor deve ser maior que zero.");
+    }
+
+    private static int GerarRequestId()
+    {
+        return Interlocked.Increment(ref _proximoRequestId);
     }
 
     private static void ValidarRequest(AtualizarPagamentoRequest request)

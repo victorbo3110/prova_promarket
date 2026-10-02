@@ -13,7 +13,7 @@ public class Pagamento
 
 public class PagamentoRequest
 {
-    public int Id { get; set; }
+    public int? Id { get; set; }
     public int PedidoId { get; set; }
     public int EventoId { get; set; }
     public decimal Valor { get; set; }

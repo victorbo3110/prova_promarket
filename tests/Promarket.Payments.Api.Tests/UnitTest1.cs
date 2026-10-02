@@ -50,24 +50,41 @@ public class PagamentosApiTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    public async Task PostPagamentos_WithSameRequestIdWithinShortInterval_ShouldFailWithoutDuplication()
+    public async Task PostPagamentos_WithoutId_ShouldCreatePaymentUsingGeneratedRequestId()
     {
         var client = _factory.CreateClient();
-        var requestId = 777;
+
+        var response = await client.PostAsJsonAsync("/pagamentos", new
+        {
+            pedidoId = 30,
+            eventoId = 4501,
+            valor = 80.50m
+        });
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var payload = await response.Content.ReadFromJsonAsync<Dictionary<string, object>>();
+        Assert.NotNull(payload);
+        Assert.True(payload!.ContainsKey("idPagamento"));
+    }
+
+    [Fact]
+    public async Task PostPagamentos_WithSamePedidoId_ShouldFailWithoutDuplication()
+    {
+        var client = _factory.CreateClient();
+        var pedidoId = 777;
 
         var first = await client.PostAsJsonAsync("/pagamentos", new
         {
-            id = requestId,
-            pedidoId = 30,
-            eventoId = 99,
+            pedidoId,
+            eventoId = 9301,
             valor = 80.50m
         });
 
         var second = await client.PostAsJsonAsync("/pagamentos", new
         {
-            id = requestId,
-            pedidoId = 31,
-            eventoId = 99,
+            pedidoId,
+            eventoId = 9302,
             valor = 80.50m
         });
 
@@ -78,7 +95,7 @@ public class PagamentosApiTests : IClassFixture<WebApplicationFactory<Program>>
         var pagamentos = await listResponse.Content.ReadFromJsonAsync<List<PagamentoResponse>>();
 
         Assert.NotNull(pagamentos);
-        Assert.Equal(1, pagamentos!.Count(p => p.EventoId == 99));
+        Assert.Equal(1, pagamentos!.Count(p => p.PedidoId == pedidoId));
     }
 
     private sealed class PagamentoResponse
